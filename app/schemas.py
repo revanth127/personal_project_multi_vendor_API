@@ -30,3 +30,17 @@ class UserResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
+#-----------------
+#Output for browsing products
+#-----------------
+
+
+class BrowseProducts(BaseModel):
+    id: int
+    name: str
+    stock_available : int
+
+    class Config:
+        from_attributes = True
+
