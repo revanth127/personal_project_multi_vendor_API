@@ -39,8 +39,18 @@ class UserResponse(BaseModel):
 class BrowseProducts(BaseModel):
     id: int
     name: str
+    price : int
     stock_available : int
 
     class Config:
         from_attributes = True
+
+#-----------------
+#input for creating a product in sellers.py
+#-----------------
+
+class ProductCreate(BaseModel):
+    name : str
+    quantity : int
+    price : int
 
