@@ -1,5 +1,5 @@
 from app.database import Base
-from sqlalchemy import TIMESTAMP, Column,Integer,Numeric,String,text,ForeignKey,Enum
+from sqlalchemy import TIMESTAMP, Column,Integer,Numeric,String,text,ForeignKey,Enum,UniqueConstraint
 
 #--------------
 #Identity & Roles
@@ -26,6 +26,10 @@ class Products(Base):
     stock = Column(Integer,nullable=False)
     owner_id = Column(ForeignKey('users.id',ondelete='CASCADE'),nullable=False,index=True)
     created_at = Column(TIMESTAMP(timezone=True),server_default=text('now()'),nullable=False)
+
+    __table_args__=(
+        UniqueConstraint('name','owner_id',name='_customer_prooduct_uc'),
+    )
 
 #--------------
 #The Transaction

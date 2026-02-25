@@ -1,5 +1,6 @@
 from pydantic import BaseModel,EmailStr
 from enum import Enum
+from typing import Optional
 
 #----------------
 #for restricting roles to only buyers or sellers
@@ -46,7 +47,7 @@ class BrowseProducts(BaseModel):
         from_attributes = True
 
 #-----------------
-#input for creating a product in sellers.py
+#input for creating a product in sellers.py in product table
 #-----------------
 
 class ProductCreate(BaseModel):
@@ -54,3 +55,11 @@ class ProductCreate(BaseModel):
     quantity : int
     price : int
 
+#-----------------
+#updating a existing product in sellers.py in product table
+#-----------------
+
+class ProductUpdate(BaseModel):
+    name : str
+    quantity : Optional[int] = None
+    price : int    
