@@ -81,7 +81,7 @@ def buy_product(ctx: MarketContext, product_id: int, quantity: int = Query(ge=1)
         )
         ctx.db.add(order_item)
         ctx.db.commit()
-        ctx.db.refresh(order)
+        ctx.db.refresh(order_item)
 
     except HTTPException:
         raise 
@@ -89,4 +89,4 @@ def buy_product(ctx: MarketContext, product_id: int, quantity: int = Query(ge=1)
         ctx.db.rollback()
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Database error")
 
-    return order
+    return order_item
