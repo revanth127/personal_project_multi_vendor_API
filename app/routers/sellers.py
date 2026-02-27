@@ -43,7 +43,7 @@ def create_product(product:schemas.ProductCreate,ctx: MarketContext):
         ctx.db.add(new_product)
         ctx.db.commit()
         ctx.db.refresh(new_product)
-    except:
+    except SQLAlchemyError:
         ctx.db.rollback()
         raise HTTPException(status_code=500, detail="Database error")
 
@@ -81,5 +81,31 @@ def update_product(product_id:int,product_update:schemas.ProductUpdate,ctx: Mark
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Database error")
     
     return {"status": "success", "message": f"{product_id} updated"}
+
+#-------------------------
+#to-do:needes to be tested
+#-------------------------
+
+@router.delete('/delete_product/{product_id}')
+def delete_product(ctx:MarketContext,product_id:int,):
+
+    product_query = ctx.db.query(models.Products).filter(models.Products.id == product_id)
+    product = product_query.first()
+
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product with id {product_id} not found"
+        )
     
-     
+    try:
+        product_query.delete(synchronize_session=False)
+        ctx.db.commit()
+    except SQLAlchemyError:
+        ctx.db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database error occurred during deletion"
+        )
+    
+    return None 
