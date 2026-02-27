@@ -51,7 +51,7 @@ def create_product(product:schemas.ProductCreate,ctx: MarketContext):
     return new_product
 
 @router.put('/update_product/{product_id}')
-def update_product(product_id:int,product_update:schemas.ProductUpdate,ctx: MarketContext,search: str | None = ''):
+def update_product(product_id:int,product_update:schemas.ProductUpdate,ctx: MarketContext):
     
     if ctx.user.role != "seller":
         raise HTTPException(
@@ -86,8 +86,8 @@ def update_product(product_id:int,product_update:schemas.ProductUpdate,ctx: Mark
 #to-do:needes to be tested
 #-------------------------
 
-@router.delete('/delete_product/{product_id}')
-def delete_product(ctx:MarketContext,product_id:int,):
+@router.delete('/delete_product/{product_id}',status_code=status.HTTP_204_NO_CONTENT)
+def delete_product(ctx:MarketContext,product_id:int):
 
     product_query = ctx.db.query(models.Products).filter(models.Products.id == product_id)
     product = product_query.first()
