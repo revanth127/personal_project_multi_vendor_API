@@ -40,45 +40,53 @@ def browse_products(ctx:MarketContext,limits: int = Query(default=15, ge=1, le=1
 #Atomic update
 #-------------------------
 
-@router.post('/buy_product')
-def buy_product(ctx:MarketContext,product_id:int,quantity:int = Query(ge=1)):
+@router.post('/buy_product/{product_id}', response_model=schemas.OrderProduct)
+def buy_product(ctx: MarketContext, product_id: int, quantity: int = Query(ge=1)):
 
     if ctx.user.role != 'buyer':
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail='Only buyers can place orders'
-        )
-    
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Only buyers can place orders')
+
     product = ctx.db.query(models.Products).filter(models.Products.id == product_id).first()
 
     if not product:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Product not found')
     if product.stock < quantity:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Insufficient stock')
-  
+
     stmt = (
         update(models.Products)
         .where(models.Products.id == product_id)
         .where(models.Products.stock >= quantity)
-        .values(stock = models.Products.stock - quantity)
+        .values(stock=models.Products.stock - quantity)
     )
-    
+
     try:
         result: CursorResult = ctx.db.execute(stmt)
+
+        if result.rowcount == 0:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Insufficient stock')
+
+        order = models.Order(
+            user_id=ctx.user.id,
+            total_amount=product.price * quantity
+        )
+        ctx.db.add(order)
+        ctx.db.flush() 
+
+        order_item = models.OrderItems(
+            order_id=order.id,
+            product_id=product_id,
+            quantity=quantity,
+            price_at_purchase=product.price
+        )
+        ctx.db.add(order_item)
         ctx.db.commit()
+        ctx.db.refresh(order)
+
+    except HTTPException:
+        raise 
     except SQLAlchemyError:
         ctx.db.rollback()
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Database error")
 
-    if result.rowcount == 0:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='Insufficient stock'
-        )
-
-    return {"message": "Order placed successfully"}
-        
-
-
-
-
+    return order

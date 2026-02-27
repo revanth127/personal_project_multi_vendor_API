@@ -36,15 +36,26 @@ class UserResponse(BaseModel):
 #Output for browsing products
 #-----------------
 
-
 class BrowseProducts(BaseModel):
     id: int
     name: str
     price : int
-    stock_available : int
+    stock : int
 
     class Config:
         from_attributes = True
+
+#-----------------
+#Output for buying product(buy_product) in buyers.py
+#-----------------
+
+class OrderProduct(BaseModel):
+    id : int
+    order_id : int
+    product_id : int
+    name : str
+    price_at_purchase : int
+
 
 #-----------------
 #input for creating a product in sellers.py in product table
