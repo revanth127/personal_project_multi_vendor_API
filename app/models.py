@@ -1,5 +1,6 @@
 from app.database import Base
-from sqlalchemy import TIMESTAMP, Column,Integer,Numeric,String,text,ForeignKey,Enum,UniqueConstraint
+from sqlalchemy import TIMESTAMP, Column,Integer,Numeric,String,text,ForeignKey,Enum,UniqueConstraint,DateTime
+from datetime import datetime,timezone
 
 #--------------
 #Identity & Roles
@@ -12,7 +13,7 @@ class Users(Base):
     email = Column(String,nullable=False,unique=True,index=True)
     hashed_password = Column(String,nullable=False)
     role = Column(Enum('buyer', 'seller', name='user_roles'), nullable=False)
-    created_at = Column(TIMESTAMP(timezone=True),server_default=text('now()'),nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 #--------------
 #The Items for Sale
@@ -25,8 +26,7 @@ class Products(Base):
     price = Column(Numeric(10,2),nullable=False)
     stock = Column(Integer,nullable=False)
     owner_id = Column(ForeignKey('users.id',ondelete='CASCADE'),nullable=False,index=True)
-    created_at = Column(TIMESTAMP(timezone=True),server_default=text('now()'),nullable=False)
-
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     __table_args__=(
         UniqueConstraint('name','owner_id',name='_customer_prooduct_uc'),
     )
@@ -49,8 +49,7 @@ class Order(Base):
     "cancelled",
     name="order_status"
 ), nullable=False, server_default="pending")
-    created_at = Column(TIMESTAMP(timezone=True),server_default=text('now()'),nullable=False)
-    
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))    
 
 #--------------
 #The specific items in an order
