@@ -1,6 +1,5 @@
 from pydantic import BaseModel,EmailStr,ConfigDict
 from enum import Enum
-from typing import Optional
 
 #----------------
 #for restricting roles to only buyers or sellers
@@ -70,5 +69,12 @@ class ProductCreate(BaseModel):
 
 class ProductUpdate(BaseModel):
     name : str
-    quantity : Optional[int] = None
-    price : int    
+    quantity : int|None = None
+    price : int
+
+#-----------------
+#Output for viewing seller products in sellers.py
+#-----------------
+class ProductOut(ProductCreate):
+    model_config = ConfigDict(from_attributes=True)
+

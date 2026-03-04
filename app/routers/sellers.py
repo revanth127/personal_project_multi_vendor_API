@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 import app.schemas as schemas
 from app.oauth2 import get_current_user
-from typing import Annotated 
+from typing import Annotated
+
 
 router = APIRouter(
     prefix='/sellers',
@@ -24,14 +25,18 @@ class Context:
 MarketContext = Annotated[Context, Depends()]
 
 
+def is_seller(ctx:MarketContext):
+    if ctx.user.role != "seller":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only sellers can update products"
+        )
+
+
 @router.post('/create_product',status_code=status.HTTP_201_CREATED)
 def create_product(product:schemas.ProductCreate,ctx: MarketContext):
     
-    if ctx.user.role != 'seller':
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, 
-            detail="Only sellers can create products"
-        )
+    is_seller(ctx)
     
     new_product = models.Products(
         name = product.name,
@@ -53,11 +58,7 @@ def create_product(product:schemas.ProductCreate,ctx: MarketContext):
 @router.put('/update_product/{product_id}')
 def update_product(product_id:int,product_update:schemas.ProductUpdate,ctx: MarketContext):
     
-    if ctx.user.role != "seller":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only sellers can update products"
-        ) 
+    is_seller(ctx) 
     
 
     product = ctx.db.query(models.Products).filter(
@@ -82,20 +83,22 @@ def update_product(product_id:int,product_update:schemas.ProductUpdate,ctx: Mark
     
     return {"status": "success", "message": f"{product_id} updated"}
 
-#-------------------------
-#to-do:needes to be tested
-#-------------------------
 
-@router.delete('/delete_product/{product_id}',status_code=status.HTTP_204_NO_CONTENT)
-def delete_product(ctx:MarketContext,product_id:int):
+@router.delete('/delete_product/{product_id}', status_code=status.HTTP_204_NO_CONTENT)
+def delete_product(ctx: MarketContext, product_id: int):
+    is_seller(ctx)
 
-    product_query = ctx.db.query(models.Products).filter(models.Products.id == product_id)
+    product_query = ctx.db.query(models.Products).filter(
+        models.Products.id == product_id,
+        models.Products.owner_id == ctx.user.id 
+    )
+    
     product = product_query.first()
 
     if not product:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Product with id {product_id} not found"
+            detail=f"Product with id {product_id} not found or unauthorized"
         )
     
     try:
@@ -108,4 +111,28 @@ def delete_product(ctx:MarketContext,product_id:int):
             detail="Database error occurred during deletion"
         )
     
-    return None 
+    return None
+
+@router.get('/my_products', response_model=list[schemas.ProductOut])
+def view_my_products(
+    ctx: MarketContext,
+    status: str|None = None,
+    min_price: str|None = None,
+    max_price: str|None = None,
+    low_stock_threshold: int = 5
+):
+    query = ctx.db.query(models.Products).filter(models.Products.owner_id == ctx.user.id)
+
+    if status == "in_stock":
+        query = query.filter(models.Products.stock > 0)
+    elif status == "out_of_stock":
+        query = query.filter(models.Products.stock == 0)
+    elif status == "low_inventory":
+        query = query.filter(models.Products.stock > 0, models.Products.stock <= low_stock_threshold)
+
+    if min_price is not None:
+        query = query.filter(models.Products.price >= min_price)
+    if max_price is not None:
+        query = query.filter(models.Products.price <= max_price)
+
+    return query.all()

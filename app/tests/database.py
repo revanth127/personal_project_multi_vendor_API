@@ -24,6 +24,6 @@ app.dependency_overrides[get_db] = ovveride_get_db
 
 @pytest.fixture(scope='module')
 def client():
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     yield TestClient(app)
-    Base.metadata.drop_all(bind=engine)
