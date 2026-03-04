@@ -1,4 +1,4 @@
-from pydantic import BaseModel,EmailStr
+from pydantic import BaseModel,EmailStr,ConfigDict
 from enum import Enum
 from typing import Optional
 
@@ -28,8 +28,7 @@ class UserResponse(BaseModel):
     email: EmailStr
     role: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 #-----------------
@@ -42,8 +41,7 @@ class BrowseProducts(BaseModel):
     price : int
     stock : int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 #-----------------
 #Output for buying product(buy_product) in buyers.py
