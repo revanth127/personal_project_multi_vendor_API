@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 from pydantic import BaseModel,EmailStr,ConfigDict
 from enum import Enum
+=======
+from pydantic import BaseModel,EmailStr, Field
+from enum import Enum
+from typing import Optional, List
+from decimal import Decimal
+>>>>>>> c3ccc0e (refactor: update services, repositories, and API layer structure)
 
 #----------------
 #for restricting roles to only buyers or sellers
@@ -9,13 +16,20 @@ class UserRole(str, Enum):
     buyer = "buyer"
     seller = "seller"
 
+class OrderStatus(str, Enum):
+    pending = "pending"
+    confirmed = "confirmed"
+    shipped = "shipped"
+    delivered = "delivered"
+    cancelled = "cancelled"
+
 #----------------
 #for creating new users
 #----------------
 
 class UserCreate(BaseModel):
     email: EmailStr
-    password: str
+    password: str = Field(..., min_length=8)
     role: UserRole
 
 #----------------
@@ -29,7 +43,6 @@ class UserResponse(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-
 #-----------------
 #Output for browsing products
 #-----------------
@@ -37,8 +50,8 @@ class UserResponse(BaseModel):
 class BrowseProducts(BaseModel):
     id: int
     name: str
-    price : int
-    stock : int
+    price: Decimal
+    stock: int
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -47,27 +60,31 @@ class BrowseProducts(BaseModel):
 #-----------------
 
 class OrderProduct(BaseModel):
-    id : int
-    order_id : int
-    product_id : int
-    name : str
-    price_at_purchase : int
+    id: int
+    order_id: int
+    product_id: int
+    name: str
+    price_at_purchase: Decimal
+    quantity: int
 
+    class Config:
+        from_attributes = True
 
 #-----------------
 #input for creating a product in sellers.py in product table
 #-----------------
 
 class ProductCreate(BaseModel):
-    name : str
-    quantity : int
-    price : int
+    name: str = Field(..., min_length=1, max_length=100)
+    quantity: int = Field(..., ge=0)
+    price: float = Field(..., ge=0)
 
 #-----------------
 #updating a existing product in sellers.py in product table
 #-----------------
 
 class ProductUpdate(BaseModel):
+<<<<<<< HEAD
     name : str
     quantity : int|None = None
     price : int
@@ -78,3 +95,32 @@ class ProductUpdate(BaseModel):
 class ProductOut(ProductCreate):
     model_config = ConfigDict(from_attributes=True)
 
+=======
+    name: Optional[str] = Field(None, min_length=1, max_length=100)
+    quantity: Optional[int] = Field(None, ge=0)
+    price: Optional[float] = Field(None, ge=0)
+
+#-----------------
+#Order schemas
+#-----------------
+
+class OrderResponse(BaseModel):
+    id: int
+    user_id: int
+    total_amount: Decimal
+    status: str
+    created_at: str
+
+    class Config:
+        from_attributes = True
+
+class OrderItemResponse(BaseModel):
+    id: int
+    order_id: int
+    product_id: int
+    quantity: int
+    price_at_purchase: Decimal
+
+    class Config:
+        from_attributes = True    
+>>>>>>> c3ccc0e (refactor: update services, repositories, and API layer structure)

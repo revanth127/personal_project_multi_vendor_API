@@ -2,15 +2,20 @@ from fastapi import FastAPI
 from app.database import engine
 from app.database import Base
 import app.models as models
-from app.routers import auth,users,sellers
-
+from app.api.v1.api import api_router
+from app.middleware.logging import LoggingMiddleware
 
 # models.Base.metadata.create_all(bind=engine)
 
+app = FastAPI(
+    title="Multi-Vendor Marketplace API",
+    description="A FastAPI-based multi-vendor marketplace with role-based access control",
+    version="1.0.0"
+)
 
-app = FastAPI()
+# Add logging middleware
+app.add_middleware(LoggingMiddleware)
 
-app.include_router(auth.router)
-app.include_router(users.router)
-app.include_router(sellers.router)
+# Include API v1 routes
+app.include_router(api_router)
 
