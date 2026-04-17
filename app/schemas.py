@@ -1,12 +1,12 @@
-<<<<<<< HEAD
+
 from pydantic import BaseModel,EmailStr,ConfigDict
 from enum import Enum
-=======
+
 from pydantic import BaseModel,EmailStr, Field
 from enum import Enum
 from typing import Optional, List
 from decimal import Decimal
->>>>>>> c3ccc0e (refactor: update services, repositories, and API layer structure)
+
 
 #----------------
 #for restricting roles to only buyers or sellers
@@ -84,25 +84,22 @@ class ProductCreate(BaseModel):
 #-----------------
 
 class ProductUpdate(BaseModel):
-<<<<<<< HEAD
-    name : str
-    quantity : int|None = None
-    price : int
-
-#-----------------
-#Output for viewing seller products in sellers.py
-#-----------------
-class ProductOut(ProductCreate):
-    model_config = ConfigDict(from_attributes=True)
-
-=======
     name: Optional[str] = Field(None, min_length=1, max_length=100)
     quantity: Optional[int] = Field(None, ge=0)
     price: Optional[float] = Field(None, ge=0)
 
-#-----------------
-#Order schemas
-#-----------------
+
+# -----------------
+# Output for viewing seller products in sellers.py
+# -----------------
+
+class ProductOut(ProductCreate):
+    model_config = ConfigDict(from_attributes=True)
+
+
+# -----------------
+# Order schemas
+# -----------------
 
 class OrderResponse(BaseModel):
     id: int
@@ -114,6 +111,7 @@ class OrderResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
 class OrderItemResponse(BaseModel):
     id: int
     order_id: int
@@ -122,5 +120,4 @@ class OrderItemResponse(BaseModel):
     price_at_purchase: Decimal
 
     class Config:
-        from_attributes = True    
->>>>>>> c3ccc0e (refactor: update services, repositories, and API layer structure)
+        from_attributes = True
