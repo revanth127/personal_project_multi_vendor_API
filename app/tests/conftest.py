@@ -9,18 +9,29 @@ def client():
 
 
 @pytest.fixture
-def test_user_seller():
+def test_user_data():
     return {
-        "email": "tester_new@gmail.com",
+        "email": "buyer@example.com",
+        "password": "securepassword123",
+        "role": "buyer"
+    }
+
+
+@pytest.fixture
+def test_seller_data():
+    return {
+        "email": "seller@example.com",
         "password": "securepassword123",
         "role": "seller"
     }
 
 
 @pytest.fixture
-def test_user_buyer():
+def test_product_data():
     return {
-        "email": "tester2_new@gmail.com",
-        "password": "securepassword1234",
-        "role": "buyer"
+        "name": "Test Product",
+        "description": "Test description",
+        "price": 100,
+        "stock": 10,
+        "category": "electronics"
     }
