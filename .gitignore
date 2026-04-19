@@ -12,3 +12,7 @@ wheels/
 .env
 .pytest_cache/
 *.pyc
+
+*.db
+
+venv/
