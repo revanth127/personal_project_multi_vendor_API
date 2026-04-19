@@ -5,10 +5,10 @@ client = TestClient(app)
 
 def test_create_user():
     res = client.post(
-        "/users/register",
+        "/api/v1/users/register",
         json={
             "email": "tester2@gmail.com",
-            "password": "1234567",
+            "password": "securepassword123",
             "role": "seller"
         }
     )

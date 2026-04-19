@@ -67,8 +67,7 @@ class OrderProduct(BaseModel):
     price_at_purchase: Decimal
     quantity: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 #-----------------
 #input for creating a product in sellers.py in product table
@@ -108,8 +107,7 @@ class OrderResponse(BaseModel):
     status: str
     created_at: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class OrderItemResponse(BaseModel):
@@ -119,5 +117,4 @@ class OrderItemResponse(BaseModel):
     quantity: int
     price_at_purchase: Decimal
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

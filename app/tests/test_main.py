@@ -1,15 +1,15 @@
 from .database import client
 
-def test_create_user(client,test_user_seller):
+def test_create_user(client,test_user_data):
     res=client.post(
-        '/users/register',json=test_user_seller
+        "/api/v1/users/register",json=test_user_data
     ) 
         
     assert res.status_code == 201, f'error{res.text}'
 
 def test_login_user(client,test_user_seller):
     res=client.post(
-        '/login',data = {"username":test_user_seller["email"],
+        '/api/v1/users/login',data = {"username":test_user_seller["email"],
                          "password":test_user_seller["password"]} 
     )
 
