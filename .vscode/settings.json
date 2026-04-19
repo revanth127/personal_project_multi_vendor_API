@@ -1,10 +1,6 @@
 {
     "python.testing.pytestArgs": [
-<<<<<<< HEAD
         "app"
-=======
-        "."
->>>>>>> c3ccc0e (refactor: update services, repositories, and API layer structure)
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Query, HTTPException, status
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.services.order_service import OrderService
-from app.middleware.auth import BuyerUser, CurrentUser
+from app.middleware.auth import BuyerUser, CurrentUser,require_buyer,require_seller,get_current_user
 from app.schemas import OrderProduct
 from typing import List
 import app.models as models
@@ -13,7 +13,7 @@ router = APIRouter(prefix="/orders", tags=["orders"])
 def buy_product(
     product_id: int,
     quantity: int = Query(default=1, ge=1),
-    current_user: BuyerUser = Depends(),
+    current_user: models.Users = Depends(require_buyer),
     db: Session = Depends(get_db)
 ):
     order_service = OrderService(db)
@@ -23,7 +23,7 @@ def buy_product(
 def get_my_orders(
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=15, ge=1, le=100),
-    current_user: CurrentUser = Depends(),
+    current_user: models.Users = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     order_service = OrderService(db)
@@ -32,7 +32,7 @@ def get_my_orders(
 @router.get("/{order_id}/items")
 def get_order_items(
     order_id: int,
-    current_user: CurrentUser = Depends(),
+    # current_user: CurrentUser = Depends(),
     db: Session = Depends(get_db)
 ):
     order_service = OrderService(db)
@@ -42,7 +42,7 @@ def get_order_items(
 def update_order_status(
     order_id: int,
     new_status: str,
-    current_user: CurrentUser = Depends(),
+    current_user: models.Users = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     order_service = OrderService(db)

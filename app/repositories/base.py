@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from typing import TypeVar, Generic, List, Optional, Dict, Any
 from app.database import Base
 
-ModelType = TypeVar("ModelType", bound=Base)
+ModelType = TypeVar("ModelType", bound = Base)
 
 class BaseRepository(Generic[ModelType]):
     def __init__(self, model: type[ModelType], db: Session):
@@ -50,3 +50,4 @@ class BaseRepository(Generic[ModelType]):
 
     def get_by_field(self, field: str, value: Any) -> Optional[ModelType]:
         return self.db.query(self.model).filter(getattr(self.model, field) == value).first()
+    

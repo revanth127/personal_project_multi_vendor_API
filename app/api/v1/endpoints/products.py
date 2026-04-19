@@ -2,17 +2,18 @@ from fastapi import APIRouter, Depends, Query, HTTPException, status
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.services.product_service import ProductService
-from app.middleware.auth import SellerUser, CurrentUser
+from app.middleware.auth import SellerUser, CurrentUser,require_seller,require_buyer
 from app.schemas import ProductCreate, ProductUpdate, BrowseProducts
 from typing import List, Optional
 from decimal import Decimal
+import app.models as models
 
 router = APIRouter(prefix="/products", tags=["products"])
 
 @router.post("/", response_model=BrowseProducts, status_code=201)
 def create_product(
     product_data: ProductCreate,
-    current_user: SellerUser = Depends(),
+    current_user: models.Users = Depends(require_seller),
     db: Session = Depends(get_db)
 ):
     product_service = ProductService(db)
@@ -47,7 +48,7 @@ def browse_products(
 def update_product(
     product_id: int,
     product_update: ProductUpdate,
-    current_user: SellerUser = Depends(),
+    current_user: models.Users = Depends(require_seller),
     db: Session = Depends(get_db)
 ):
     product_service = ProductService(db)
@@ -57,7 +58,7 @@ def update_product(
 @router.delete("/{product_id}", status_code=204)
 def delete_product(
     product_id: int,
-    current_user: SellerUser = Depends(),
+    current_user: models.Users = Depends(require_seller),
     db: Session = Depends(get_db)
 ):
     product_service = ProductService(db)
