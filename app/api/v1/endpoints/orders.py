@@ -9,7 +9,7 @@ import app.models as models
 
 router = APIRouter(prefix="/orders", tags=["orders"])
 
-@router.post("/buy/{product_id}", response_model=OrderProduct)
+@router.post("/buy/{product_id}")
 def buy_product(
     product_id: int,
     quantity: int = Query(default=1, ge=1),

@@ -24,8 +24,8 @@ def test_create_product_success(client: TestClient, test_seller_data, test_produ
     assert response.status_code == 201
     data = response.json()
     assert data["name"] == test_product_data["name"]
-    assert data["price"] == test_product_data["price"]
-    assert data["stock"] == test_product_data["quantity"]
+    assert float(data["price"]) == test_product_data["price"] 
+    assert data["stock"] == test_product_data["stock"]
 
 def test_create_product_unauthorized_buyer(client: TestClient, test_user_data, test_product_data):
     headers = get_auth_headers(client, test_user_data)

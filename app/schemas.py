@@ -75,7 +75,7 @@ class OrderProduct(BaseModel):
 
 class ProductCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
-    quantity: int = Field(..., ge=0)
+    stock: int = Field(..., ge=0)
     price: float = Field(..., ge=0)
 
 #-----------------
@@ -84,7 +84,7 @@ class ProductCreate(BaseModel):
 
 class ProductUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=100)
-    quantity: Optional[int] = Field(None, ge=0)
+    stock: Optional[int] = Field(None, ge=0)
     price: Optional[float] = Field(None, ge=0)
 
 

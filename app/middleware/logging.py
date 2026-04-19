@@ -53,16 +53,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             process_time = time.time() - start_time
             
             # Log error
-            logger.error(
-                "Request failed",
-                extra={
-                    "method": request.method,
-                    "url": str(request.url),
-                    "error": str(e),
-                    "process_time": round(process_time, 4),
-                    "timestamp": time.time()
-                }
-            )
+            logger.error("Request failed", exc_info=True)
             
             # Return error response
             return JSONResponse(

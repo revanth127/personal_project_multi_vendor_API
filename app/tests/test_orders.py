@@ -46,14 +46,15 @@ def test_place_order_unauthorized_seller(client: TestClient, test_seller_data, t
 def test_place_order_insufficient_stock(client: TestClient, test_seller_data, test_user_data, test_product_data):
     # Create seller and product with low stock
     seller_headers = get_auth_headers(client, test_seller_data)
-    low_stock_product = {**test_product_data, "quantity": 1}
+    low_stock_product = {**test_product_data, "stock": 1}
     product_response = client.post("/api/v1/products/", json=low_stock_product, headers=seller_headers)
     product_id = product_response.json()["id"]
     
     # Try to buy more than available
     buyer_headers = get_auth_headers(client, test_user_data)
     response = client.post(f"/api/v1/orders/buy/{product_id}?quantity=5", headers=buyer_headers)
-    
+    print(response.json())
+
     assert response.status_code == 400
     assert "Insufficient stock" in response.json()["detail"]
 
@@ -83,7 +84,7 @@ def test_update_order_status(client: TestClient, test_seller_data, test_user_dat
     # Create buyer and place order
     buyer_headers = get_auth_headers(client, test_user_data)
     order_response = client.post(f"/api/v1/orders/buy/{product_id}?quantity=1", headers=buyer_headers)
-    order_id = order_response.json()["order_id"]
+    order_id = order_response.json()["id"] 
     
     # Seller updates order status
     response = client.put(f"/api/v1/orders/{order_id}/status?new_status=confirmed", headers=seller_headers)

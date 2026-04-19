@@ -43,7 +43,7 @@ class Order(Base):
     total_amount = Column(Numeric(10,2),nullable=False)
     status = Column(Enum(
     "pending",
-    "paid",
+    "confirmed",
     "shipped",
     "delivered",
     "cancelled",

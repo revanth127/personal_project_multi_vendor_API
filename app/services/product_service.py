@@ -14,7 +14,7 @@ class ProductService:
         product = self.product_repo.create_product(
             name=product_data.name,
             price=Decimal(str(product_data.price)),
-            stock=product_data.quantity,
+            stock=product_data.stock,
             owner_id=seller_id
         )
         return product
